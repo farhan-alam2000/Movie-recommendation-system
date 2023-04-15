@@ -6,7 +6,11 @@
 </head>
 <body>
     <h1>Movie Recommendation System</h1>
-    
+    <form method="POST" action="/logout">
+        <div>
+            <button type="submit">Logout</button>
+        </div>
+    </form>
     {% for movie in movie_data %}
     <div class="movie">
         <h2>{{ movie["title"] }}</h2>

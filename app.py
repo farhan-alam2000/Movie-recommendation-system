@@ -17,16 +17,22 @@ mongo = PyMongo(app)
 
 @app.route("/home", methods=['GET', 'POST'])
 def home():
-    # Fetch movie data and store it in a list
-    movie_data = [
-        {"title": "Batman", "poster_path": "/static/images/batman.jpeg"},
-        {"title": "The Avengers", "poster_path": "/static/images/avengers.jpeg"}
-    ]
-    
-    # Render the home.html template and pass in the movie data
-    return render_template("home.html", movie_data=movie_data)
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    if request.method == 'GET':
+        # Fetch movie data and store it in a list
+        movie_data = [
+            {"title": "Batman", "poster_path": "/static/images/batman.jpeg"},
+            {"title": "The Avengers", "poster_path": "/static/images/avengers.jpeg"}
+        ]
+        
+        # Render the home.html template and pass in the movie data
+        return render_template("home.html", movie_data=movie_data)
 
-
+@app.route('/logout', methods = ['POST'])
+def logout():
+    session.pop('logged_in', None)
+    return render_template('login.html')
 
 
 
@@ -66,12 +72,11 @@ def login():
         password = request.form['password'].encode('utf-8')
 
         user = mongo.db.users.find_one({'email': email})
-        print(user)
         if user:
             # Verify password
             if bcrypt.checkpw(password, user['password']):
+                session['logged_in'] = True
                 session['email'] = email
-                print(email)
                 return redirect(url_for('home'))
             else:
                 error = 'Invalid password'
