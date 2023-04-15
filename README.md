@@ -1,3 +1,7 @@
 # Movie-recommendation-system
 
-Create a .env and add mongoDB password and Flask app secret key (can be generated using random_1.py)
+#setup
+1. create a new db in mongo and copy the uri of of a cluster in app.py
+2. create a app secret key using random_1.py
+3. store mongodb password and app secret key in .env file 
+
