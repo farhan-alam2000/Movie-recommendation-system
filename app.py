@@ -3,6 +3,7 @@ from flask_pymongo import PyMongo
 import bcrypt
 from dotenv import load_dotenv
 import os
+import movie_poster
 
 load_dotenv()
 
@@ -15,19 +16,29 @@ app.config['MONGO_URI'] = 'mongodb+srv://alaammfarhan:'+password+'@cluster0.xlwe
 
 mongo = PyMongo(app)
 
+@app.route("/")
+def index():
+    if 'logged_in' not in session:
+        return redirect(url_for('login'))
+    return redirect(url_for('home'))
+
 @app.route("/home", methods=['GET', 'POST'])
 def home():
     if 'logged_in' not in session:
         return redirect(url_for('login'))
     if request.method == 'GET':
         # Fetch movie data and store it in a list
-        movie_data = [
-            {"title": "Batman", "poster_path": "/static/images/batman.jpeg"},
-            {"title": "The Avengers", "poster_path": "/static/images/avengers.jpeg"}
-        ]
-        
+        movie_list = ["Batman", "The Avengers", "Toy Story"] # to be replaced by csv file
+
+        movies_data = []
+        for movie_name in movie_list:
+            movie_data = {}
+            movie_data["title"] = movie_name
+            movie_data["poster_path"] = movie_poster.get_movie_poster_url(movie_name)
+            movies_data.append(movie_data)
+
         # Render the home.html template and pass in the movie data
-        return render_template("home.html", movie_data=movie_data)
+        return render_template("home.html", movies_data=movies_data)
 
 @app.route('/logout', methods = ['POST'])
 def logout():

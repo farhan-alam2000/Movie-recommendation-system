@@ -11,7 +11,7 @@
             <button type="submit">Logout</button>
         </div>
     </form>
-    {% for movie in movie_data %}
+    {% for movie in movies_data %}
     <div class="movie">
         <h2>{{ movie["title"] }}</h2>
         <img src="{{ movie["poster_path"] }}" alt="{{ movie["title"] }} poster">
