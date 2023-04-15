@@ -1,7 +1,11 @@
 import requests
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 base_url = "http://www.omdbapi.com/"
-api_key = "374c6e5b"
+api_key = os.getenv("OMDB_API_KEY")
 
 def get_movie_poster_url(movie_name):
     response = requests.get(base_url, params={"apikey": api_key, "t": movie_name})
