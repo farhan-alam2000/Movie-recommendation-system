@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_pymongo import PyMongo
 import bcrypt
 from dotenv import load_dotenv
@@ -28,7 +28,12 @@ def home():
         return redirect(url_for('login'))
     if request.method == 'GET':
         # Fetch movie data and store it in a list
+
+        # top_K_list = [1,2,3] -> 'models output' 
+        # for k in top_K_list:
+        #     movie_name = DBcallById()
         movie_list = ["Batman", "The Avengers", "Toy Story"] # to be replaced by csv file
+        # ratings = [null, 3, 4] # display ratings
 
         movies_data = []
         for movie_name in movie_list:
@@ -43,7 +48,7 @@ def home():
 @app.route('/logout', methods = ['POST'])
 def logout():
     session.pop('logged_in', None)
-    return render_template('login.html')
+    return redirect(url_for('login'))
 
 
 
@@ -99,6 +104,28 @@ def login():
         return render_template('login.html')
 
 
+
+@app.route('/matrix', methods=['POST'])
+def create_matrix():
+    data = request.get_json()
+    rows = data['rows']
+    cols = data['cols']
+    matrix = data['data']
+    # document-based format
+    matrix_doc = {
+        'name': 'URM',
+        'matrix': matrix,
+        'rows': rows,
+        'cols': cols
+    }
+    mongo.db.matrices.insert_one(matrix_doc)
+    return jsonify({'message': 'Matrix created successfully!'})
+
+@app.route('/matrix', methods=['GET'])
+def fetch_matrix():
+    matrix = mongo.db.matrices.find_one({'name':'URM'})
+    # print(matrix)
+    return 
 
 if __name__ == '__main__':
     app.run(debug=True)
