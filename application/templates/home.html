@@ -16,6 +16,7 @@
     {% for movie in movies_data %}
     <div class="movie">
         <h2>{{ movie["title"] }}</h2>
+        <h3>{{ movie["movie_id"]}}</h3>
         <img src="{{ movie["poster_path"] }}" alt="{{ movie["title"] }} poster">
         <form>
             <input type="radio" name="{{ movie["movie_id"] }}" value="like"> Like

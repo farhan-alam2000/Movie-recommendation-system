@@ -37,6 +37,9 @@ def home():
     if 'logged_in' not in session or session['logged_in'] == False:
         return redirect(url_for('login'))
     if request.method == 'GET':
+
+        session['refreshed'] = True
+
         print_session_detail()
         userId = int(session['userId'])
         # movie_ids=getTopK(userId);
@@ -48,7 +51,7 @@ def home():
         movies_data = []
         for movie_id in movie_ids:
             movie_id_str=str(movie_id);
-            movie = mongo.db.csvs.find_one({'movieId':movie_id_str})
+            movie = mongo.db.movies.find_one({'movieId':movie_id_str})
             movieName = str(movie["title"])
             movie_name_without_year = movieName[:-6]
             movie_data = {}
@@ -59,7 +62,7 @@ def home():
 
         # Render the home.html template and pass in the movie data
         return render_template("home.html", movies_data=movies_data)
-
+        
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -88,6 +91,11 @@ def signup():
         return redirect(url_for('login'))
     else:
         return render_template('register.html')
+    
+
+# @app.route('/clearVotes', methods=['POST'])
+# def clear_votes():
+
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -125,10 +133,19 @@ def vote():
 
     # Get the votes dictionary from the cookie or create a new one if it doesn't exist
     votes_cookie = request.cookies.get('votes')
-    if votes_cookie:
+    # refreshed = request.cookies.get('refreshed')
+    # refreshed = request.cookies.get('refreshed')
+
+    refreshed = session['refreshed']
+    if refreshed == True:
+        refreshed = False
+        votes = {}
+    elif votes_cookie:
         votes = json.loads(votes_cookie)
     else:
         votes = {}
+
+    session['refreshed'] = refreshed    
 
     # Update the votes dictionary with the new vote
     votes[movie_id] = vote_value
@@ -139,7 +156,7 @@ def vote():
     # Save the updated votes dictionary to a cookie and return a response
     response = make_response('OK')
     response.set_cookie('votes', value=json.dumps(votes))
-    
+    # response.set_cookie('refreshed', refreshed)
     print_session_detail()
     return response
 
@@ -155,28 +172,6 @@ def logout():
     response = make_response(redirect(url_for('login')))
     response.delete_cookie('votes')
     return response
-
-# @app.route('/matrix', methods=['POST'])
-# def create_matrix():
-#     data = request.get_json()
-#     rows = data['rows']
-#     cols = data['cols']
-#     matrix = data['data']
-#     # document-based format
-#     matrix_doc = {
-#         'name': 'URM',
-#         'matrix': matrix,
-#         'rows': rows,
-#         'cols': cols
-#     }
-#     mongo.db.matrices.insert_one(matrix_doc)
-#     return jsonify({'message': 'Matrix created successfully!'})
-
-# @app.route('/matrix', methods=['GET'])
-# def fetch_matrix():
-#     matrix = mongo.db.matrices.find_one({'name':'URM'})
-#     # print(matrix)
-#     return 
 
 if __name__ == '__main__':
     app.run(debug=True)
@@ -201,6 +196,10 @@ def print_session_detail():
     votes_cookie = request.cookies.get('votes')
     if votes_cookie:
         votes = json.loads(votes_cookie)
+        movie_ids = []
+        vote_values = []
         for movie_id, vote_value in votes.items():
+            movie_ids.append(movie_id)
+            vote_values.append(vote_value)
             print(f"Movie ID {movie_id}: Vote value {vote_value}")
 
