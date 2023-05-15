@@ -265,8 +265,9 @@ def get_movie_actors(movie_name):
         return "N/A"
     actors_str = data["Actors"]
 
-    # actors = actors_str.split(',')
-    return actors_str
+    actors = actors_str.split(',')
+    actors = actors[:2]
+    return actors
 
 def get_movie_directors(movie_name):
     response = requests.get(base_url, params={"apikey": api_key, "t": movie_name})
