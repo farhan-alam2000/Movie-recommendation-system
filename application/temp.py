@@ -19,8 +19,17 @@ with open('popularMovies.json') as file:
     data = json.load(file)
 
 # Get the array of movies
-movies = data['Action']
+# movies = data['Action']
+# # Print the movies
+# for movie in movies:
+#     print(movie)
 
-# Print the movies
-for movie in movies:
-    print(movie)
+
+keys = list(data.keys())
+keys = keys[1:]
+# Print the keys (skipping the first one)
+
+for key in keys:
+    print(key)
+
+
